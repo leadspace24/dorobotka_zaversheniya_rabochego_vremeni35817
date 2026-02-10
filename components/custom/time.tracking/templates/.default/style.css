@@ -1,0 +1,51 @@
+/* Только основные стили для таблицы */
+.deals-table {
+    width: 100%;
+    min-width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+}
+
+.deals-table th {
+    background-color: #f8f9fa;
+    padding: 10px 8px;
+    text-align: left;
+    border-bottom: 1px solid #dee2e6;
+    font-weight: bold;
+}
+
+.deals-table td {
+    padding: 8px;
+    border-bottom: 1px solid #dee2e6;
+    vertical-align: middle;
+}
+
+/* Ширина колонок - только самое необходимое */
+.deals-table td:first-child {
+    width: 35%;
+}
+
+.deals-table td:nth-child(2) {
+    width: 15%;
+}
+
+.deals-table td:nth-child(3) {
+    width: 10%;
+}
+
+.deals-table td:nth-child(4) {
+    width: 40%;
+}
+
+/* Поля ввода на всю ширину ячейки */
+.deals-table input {
+    width: 100%;
+    height: 30px;
+    box-sizing: border-box;
+}
+
+/* Контейнер для скролла */
+.modal-body {
+    max-height: 400px;
+    overflow-y: auto;
+}
