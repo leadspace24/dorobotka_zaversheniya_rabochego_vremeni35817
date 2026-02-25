@@ -20,6 +20,7 @@ $APPLICATION->IncludeComponent(
         "FIELD_TIME_SPENT" => "UF_CRM_30_1770360084006",
         "FIELD_COMMENT" => "UF_CRM_30_1770360099630",
         "FIELD_DEAL_STAGE" => "UF_CRM_30_1770362875416",
+        "FIELD_FUNNEL" => "UF_CRM_30_1771589643886",
         "CACHE_TIME" => 0
     ],
     false

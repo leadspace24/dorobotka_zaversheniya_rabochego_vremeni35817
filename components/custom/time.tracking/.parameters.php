@@ -145,6 +145,12 @@ $arComponentParameters = [
             "TYPE" => "STRING",
             "DEFAULT" => "ufCrm_7_DEAL_STAGE",
         ],
+        "FIELD_FUNNEL" => [
+            "PARENT" => "SMART_PROCESS",
+            "NAME" => "Символьный код поля \"Воронка\"",
+            "TYPE" => "STRING",
+            "DEFAULT" => "ufCrm_30_1771589643886",
+        ],
         
         // Кеширование
         "CACHE_TIME" => [

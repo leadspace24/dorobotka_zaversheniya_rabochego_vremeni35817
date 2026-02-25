@@ -6,7 +6,7 @@
         
         if (typeof BX !== 'undefined' && BX.SidePanel && BX.SidePanel.Instance) {
             BX.SidePanel.Instance.open('/timer/index.php', {
-                width: 1200,
+                width: 1600,
                 cacheable: false,
                 allowChangeHistory: false,
                 events: {

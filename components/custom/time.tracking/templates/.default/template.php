@@ -28,6 +28,7 @@ window.TimeTrackingConfig = <?= CUtil::PhpToJSObject([
     'FIELD_TIME_SPENT' => $arResult['CONFIG']['FIELD_TIME_SPENT'],
     'FIELD_COMMENT' => $arResult['CONFIG']['FIELD_COMMENT'],
     'FIELD_DEAL_STAGE' => $arResult['CONFIG']['FIELD_DEAL_STAGE'],
+    'FIELD_FUNNEL' => $arResult['CONFIG']['FIELD_FUNNEL']
 ], false, true, true) ?>;
 window.TimeTrackingConfig.AJAX_URL = '<?= CUtil::JSEscape($arResult['AJAX_URL']) ?>';
 window.TimeTrackingConfig.USER_ID = <?= intval($arResult['USER_ID']) ?>;

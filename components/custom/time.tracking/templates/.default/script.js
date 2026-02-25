@@ -86,9 +86,12 @@
             
             const content = document.createElement('div');
             content.className = 'time-tracking-content';
+            // Увеличиваем отступы в 2 раза
+            content.style.padding = '40px';
             
             const header = document.createElement('div');
             header.className = 'time-tracking-header';
+            header.style.marginBottom = '20px';
             header.innerHTML = `
                 <h2>Учет трудозатрат за ${this.getCurrentDate()}</h2>
                 <p class="time-tracking-description">Укажите время, затраченное на каждую сделку</p>
@@ -102,6 +105,7 @@
             
             const footer = document.createElement('div');
             footer.className = 'time-tracking-footer';
+            footer.style.marginTop = '40px';
             
             const submitBtn = document.createElement('button');
             submitBtn.className = 'ui-btn ui-btn-success';
@@ -115,9 +119,11 @@
             const messageContainer = document.createElement('div');
             messageContainer.id = 'messageContainer';
             messageContainer.className = 'message-container';
+            messageContainer.style.marginTop = '20px';
             content.appendChild(messageContainer);
             
             this.container.innerHTML = '';
+            this.container.style.padding = '40px'; // Увеличиваем отступы контейнера в 2 раза
             this.container.appendChild(content);
         },
 
@@ -129,9 +135,10 @@
             thead.innerHTML = `
                 <tr>
                     <th>Сделка</th>
+                    <th>Воронка</th>
                     <th>Статус проекта</th>
-                    <th style="width: 150px;">Затраченное время (часы)</th>
-                    <th style="width: 250px;">Комментарий</th>
+                    <th>Трудозатраты (минуты)</th>
+                    <th>Комментарий</th>
                 </tr>
             `;
             table.appendChild(thead);
@@ -141,37 +148,61 @@
                 const row = document.createElement('tr');
                 row.dataset.dealId = deal.ID;
                 
+                // Название сделки - кликабельное, открывается в новом окне
                 const titleCell = document.createElement('td');
-                titleCell.className = 'deal-title';
-                titleCell.textContent = deal.TITLE;
+                const dealLink = document.createElement('a');
+                dealLink.href = `/crm/deal/details/${deal.ID}/`;
+                dealLink.target = '_blank';
+                dealLink.textContent = deal.TITLE;
+                dealLink.style.textDecoration = 'none';
+                dealLink.style.color = '#2067b0';
+                dealLink.style.cursor = 'pointer';
+                dealLink.onmouseover = () => dealLink.style.textDecoration = 'underline';
+                dealLink.onmouseout = () => dealLink.style.textDecoration = 'none';
+                titleCell.appendChild(dealLink);
                 row.appendChild(titleCell);
                 
+                // Воронка
+                const funnelCell = document.createElement('td');
+                funnelCell.textContent = deal.FUNNEL_NAME || 'Не указана';
+                funnelCell.dataset.funnelId = deal.FUNNEL_ID;
+                row.appendChild(funnelCell);
+                
+                // Статус
                 const stageCell = document.createElement('td');
-                stageCell.className = 'deal-stage';
                 stageCell.textContent = deal.STAGE_NAME;
                 row.appendChild(stageCell);
                 
+                // Время
                 const timeCell = document.createElement('td');
                 const timeInput = document.createElement('input');
                 timeInput.type = 'number';
                 timeInput.className = 'time-input';
                 timeInput.min = '0';
-                timeInput.step = '0.5';
+                timeInput.step = '1';
                 timeInput.value = '0';
-                timeInput.placeholder = '0';
+                timeInput.placeholder = 'минуты';
                 timeInput.dataset.index = index;
                 timeInput.dataset.dealId = deal.ID;
                 timeCell.appendChild(timeInput);
                 row.appendChild(timeCell);
                 
+                // Комментарий - ИЗМЕНЕНО: теперь textarea вместо input
                 const commentCell = document.createElement('td');
-                const commentInput = document.createElement('input');
-                commentInput.type = 'text';
-                commentInput.className = 'comment-input';
-                commentInput.placeholder = 'Комментарий (необязательно)';
-                commentInput.dataset.index = index;
-                commentInput.dataset.dealId = deal.ID;
-                commentCell.appendChild(commentInput);
+                const commentTextarea = document.createElement('textarea');
+                commentTextarea.className = 'comment-input';
+                commentTextarea.placeholder = 'Комментарий (необязательно)';
+                commentTextarea.rows = 1;
+                commentTextarea.dataset.index = index;
+                commentTextarea.dataset.dealId = deal.ID;
+                
+                // Добавляем автоматическое расширение
+                commentTextarea.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                });
+                
+                commentCell.appendChild(commentTextarea);
                 row.appendChild(commentCell);
                 
                 tbody.appendChild(row);
@@ -185,20 +216,26 @@
             if (this.isLoading) return;
             
             const timeInputs = document.querySelectorAll('.time-input');
-            const commentInputs = document.querySelectorAll('.comment-input');
+            const commentTextareas = document.querySelectorAll('.comment-input');
             const records = [];
             
             timeInputs.forEach((input, index) => {
-                const time = parseFloat(input.value) || 0;
-                if (time > 0) {
+                const timeInMinutes = parseInt(input.value) || 0;
+                if (timeInMinutes > 0) {
                     const deal = this.deals[index];
+                    // Получаем название воронки из ячейки таблицы
+                    const funnelCell = input.closest('tr').querySelector('td:nth-child(2)');
+                    const funnelName = funnelCell ? funnelCell.textContent : 'Не указана';
+                    
                     records.push({
                         dealId: deal.ID,
                         dealTitle: deal.TITLE,
                         stageId: deal.STAGE_ID,
                         stageName: deal.STAGE_NAME,
-                        time: time,
-                        comment: commentInputs[index].value.trim()
+                        timeInMinutes: timeInMinutes,
+                        timeInHours: (timeInMinutes / 60).toFixed(2),
+                        comment: commentTextareas[index].value.trim(), // Работает и с textarea
+                        funnelName: funnelName
                     });
                 }
             });
@@ -224,17 +261,21 @@
                     fieldDeal: this.config.FIELD_DEAL,
                     fieldTimeSpent: this.config.FIELD_TIME_SPENT,
                     fieldComment: this.config.FIELD_COMMENT,
-                    fieldDealStage: this.config.FIELD_DEAL_STAGE
+                    fieldDealStage: this.config.FIELD_DEAL_STAGE,
+                    fieldFunnel: this.config.FIELD_FUNNEL || 'Воронка'
                 },
                 onsuccess: (response) => {
                     this.isLoading = false;
                     this.hideLoader();
                     if (response.success) {
                         this.showSuccess(response.message || `Успешно отправлено записей: ${response.data.created}`);
-                        // Очищаем поля после успешной отправки
                         setTimeout(() => {
                             document.querySelectorAll('.time-input').forEach(input => input.value = '0');
-                            document.querySelectorAll('.comment-input').forEach(input => input.value = '');
+                            document.querySelectorAll('.comment-input').forEach(textarea => {
+                                textarea.value = '';
+                                // Сбрасываем высоту textarea
+                                textarea.style.height = 'auto';
+                            });
                         }, 2000);
                     } else {
                         this.showError(response.message || 'Ошибка при сохранении данных');
@@ -294,6 +335,8 @@
             const messageDiv = document.createElement('div');
             messageDiv.className = `message message-${type}`;
             messageDiv.textContent = message;
+            messageDiv.style.padding = '20px';
+            messageDiv.style.margin = '10px 0';
             container.innerHTML = '';
             container.appendChild(messageDiv);
             setTimeout(() => { if (messageDiv.parentNode) messageDiv.remove(); }, 5000);

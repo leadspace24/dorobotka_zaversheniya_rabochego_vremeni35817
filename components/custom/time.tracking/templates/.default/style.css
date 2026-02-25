@@ -1,51 +1,158 @@
-/* Только основные стили для таблицы */
-.deals-table {
-    width: 100%;
-    min-width: 100%;
-    border-collapse: collapse;
-    font-size: 16px;
-}
-
-.deals-table th {
-    background-color: #f8f9fa;
-    padding: 10px 8px;
-    text-align: left;
-    border-bottom: 1px solid #dee2e6;
-    font-weight: bold;
-}
-
-.deals-table td {
-    padding: 8px;
-    border-bottom: 1px solid #dee2e6;
-    vertical-align: middle;
-}
-
-/* Ширина колонок - только самое необходимое */
-.deals-table td:first-child {
-    width: 35%;
-}
-
-.deals-table td:nth-child(2) {
-    width: 15%;
-}
-
-.deals-table td:nth-child(3) {
-    width: 10%;
-}
-
-.deals-table td:nth-child(4) {
-    width: 40%;
-}
-
-/* Поля ввода на всю ширину ячейки */
-.deals-table input {
-    width: 100%;
-    height: 30px;
-    box-sizing: border-box;
-}
-
 /* Контейнер для скролла */
 .modal-body {
     max-height: 400px;
     overflow-y: auto;
+    overflow-x: auto;
+    padding: 0 !important; /* Убираем паддинги, чтобы таблица занимала всю ширину */
+}
+
+/* Основные стили для таблицы */
+.deals-table {
+    width: 100%;
+    min-width: 900px; /* Немного увеличил минимальную ширину */
+    border-collapse: collapse;
+    font-size: 16px;
+    table-layout: fixed; /* Меняем на fixed для более точного контроля */
+}
+
+.deals-table th {
+    background-color: #f8f9fa;
+    padding: 12px 8px;
+    text-align: center;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: bold;
+}
+
+.deals-table td {
+    padding: 12px 8px;
+    border-bottom: 1px solid #dee2e6;
+    vertical-align: middle;
+    word-break: break-word; /* Разрешаем перенос слов */
+    white-space: normal; /* Текст переносится на следующую строку */
+    text-align: center;
+}
+
+/* Стили для числового поля времени */
+.deals-table .time-input {
+    width: 100%;
+    height: 36px;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+/* Стили для textarea комментария */
+.deals-table .comment-input {
+    width: 100%;
+    min-height: 36px;
+    max-height: 200px;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    overflow-y: auto;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+    line-height: 1.4;
+}
+
+.deals-table input:focus,
+.deals-table .comment-input:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Стили для ссылок на сделки */
+.deals-table a {
+    color: #2067b0;
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-block;
+    word-break: break-word;
+    white-space: normal;
+}
+
+.deals-table a:hover {
+    text-decoration: underline;
+}
+
+/* Распределение ширины столбцов */
+.deals-table th:nth-child(1),
+.deals-table td:nth-child(1) {
+    width: 15%; /* Название сделки */
+}
+
+.deals-table th:nth-child(2),
+.deals-table td:nth-child(2) {
+    width: 18%; /* Воронка */
+}
+
+.deals-table th:nth-child(3),
+.deals-table td:nth-child(3) {
+    width: 15%; /* Статус */
+}
+
+.deals-table th:nth-child(4),
+.deals-table td:nth-child(4) {
+    width: 10%; /* Время */
+}
+
+.deals-table th:nth-child(5),
+.deals-table td:nth-child(5) {
+    width: 42%; /* Комментарий */
+}
+
+/* Специальные стили для поля времени */
+.deals-table td:nth-child(4) .time-input {
+    width: 80px; /* Фиксированная ширина для поля времени */
+    min-width: 70px;
+    margin: 0 auto;
+    display: block;
+}
+
+/* Все текстовые ячейки переносят текст */
+.deals-table td {
+    white-space: normal;
+    word-wrap: break-word;
+}
+
+/* Стили для сообщений */
+.message-container {
+    margin-top: 20px;
+}
+
+.message {
+    padding: 15px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.message-success {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.message-warning {
+    background-color: #fff3cd;
+    border: 1px solid #ffeeba;
+    color: #856404;
+}
+
+.message-error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.message-info {
+    background-color: #d1ecf1;
+    border: 1px solid #bee5eb;
+    color: #0c5460;
 }

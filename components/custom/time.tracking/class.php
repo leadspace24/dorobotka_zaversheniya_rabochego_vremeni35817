@@ -24,6 +24,7 @@ class TimeTrackingComponent extends CBitrixComponent
         $arParams['FIELD_TIME_SPENT'] = trim($arParams['FIELD_TIME_SPENT'] ?? 'ufCrm_7_TIME_SPENT');
         $arParams['FIELD_COMMENT'] = trim($arParams['FIELD_COMMENT'] ?? 'ufCrm_7_COMMENT');
         $arParams['FIELD_DEAL_STAGE'] = trim($arParams['FIELD_DEAL_STAGE'] ?? 'ufCrm_7_DEAL_STAGE');
+        $arParams['FIELD_FUNNEL'] = trim($arParams['FIELD_FUNNEL'] ?? 'ufCrm_7_FUNNEL');
         $arParams['CACHE_TIME'] = intval($arParams['CACHE_TIME'] ?? 3600);
         return $arParams;
     }
@@ -80,6 +81,7 @@ class TimeTrackingComponent extends CBitrixComponent
             'FIELD_TIME_SPENT' => $this->arParams['FIELD_TIME_SPENT'],
             'FIELD_COMMENT' => $this->arParams['FIELD_COMMENT'],
             'FIELD_DEAL_STAGE' => $this->arParams['FIELD_DEAL_STAGE'],
+            'FIELD_FUNNEL' => $this->arParams['FIELD_FUNNEL'],
         ];
         
         $this->arResult['USER_ID'] = $userId;
