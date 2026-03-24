@@ -45,7 +45,6 @@ $arSmartProcesses = [];
 if (Loader::includeModule('crm')) {
     $resTypes = TypeTable::getList([
         'select' => ['ID', 'ENTITY_TYPE_ID', 'TITLE'],
-        'filter' => ['=IS_DYNAMIC' => 'Y'],
         'order' => ['TITLE' => 'ASC']
     ]);
     
@@ -145,11 +144,20 @@ $arComponentParameters = [
             "TYPE" => "STRING",
             "DEFAULT" => "ufCrm_7_DEAL_STAGE",
         ],
+        
         "FIELD_FUNNEL" => [
             "PARENT" => "SMART_PROCESS",
             "NAME" => "Символьный код поля \"Воронка\"",
             "TYPE" => "STRING",
             "DEFAULT" => "ufCrm_30_1771589643886",
+        ],
+        
+        "FIELD_TIME_TYPE" => [
+            "PARENT" => "SMART_PROCESS",
+            "NAME" => "Символьный код поля \"Тип списания\"",
+            "TYPE" => "STRING",
+            "DEFAULT" => "ufCrm_7_TIME_TYPE",
+            "DESCRIPTION" => "Поле-список для выбора типа списания времени",
         ],
         
         // Кеширование

@@ -84,7 +84,6 @@ function getDeals() {
         foreach ($allFunnels as $funnelId) {
             if ($funnelId <= 0) continue;
             
-            // Получаем название воронки через DealCategory::get()
             $funnelInfo = \Bitrix\Crm\Category\DealCategory::get($funnelId);
             $funnelName = $funnelInfo ? $funnelInfo['NAME'] : 'Неизвестная воронка';
             
@@ -114,20 +113,14 @@ function getDeals() {
                         'STAGE_ID' => $deal['STAGE_ID'],
                         'STAGE_NAME' => $stageName,
                         'CATEGORY_ID' => $deal['CATEGORY_ID'],
-                        'FUNNEL_NAME' => $funnelName, // Добавляем название воронки
-                        'FUNNEL_ID' => $deal['CATEGORY_ID'] // Добавляем ID воронки для полноты
+                        'FUNNEL_NAME' => $funnelName,
+                        'FUNNEL_ID' => $deal['CATEGORY_ID']
                     ];
                     
                     $dealIds[] = $deal['ID'];
                 }
             }
         }
-        
-        // Сортируем сделки по дате модификации (свежие сверху)
-        usort($deals, function($a, $b) {
-            // Здесь можно добавить сортировку по дате, если нужно
-            return 0;
-        });
         
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode([
@@ -152,46 +145,45 @@ function saveTimeRecords() {
     
     try {
         $records = $_POST['records'] ?? [];
+        $additionalWorks = $_POST['additionalWorks'] ?? [];
         
         if (is_string($records)) {
             $recordsJson = $records;
-            
             if (strpos($recordsJson, "'") !== false) {
                 $recordsJson = str_replace("'", '"', $recordsJson);
             }
-            
             $records = json_decode($recordsJson, true);
-            
-            if (json_last_error() !== JSON_ERROR_NONE) {
-                http_response_code(400);
-                die(json_encode([
-                    'success' => false, 
-                    'message' => 'Некорректный формат данных',
-                    'json_error' => json_last_error_msg()
-                ]));
-            }
         }
         
-        if (!is_array($records)) {
-            http_response_code(400);
-            die(json_encode([
-                'success' => false, 
-                'message' => 'Данные должны быть массивом'
-            ]));
+        if (is_string($additionalWorks)) {
+            $additionalWorksJson = $additionalWorks;
+            if (strpos($additionalWorksJson, "'") !== false) {
+                $additionalWorksJson = str_replace("'", '"', $additionalWorksJson);
+            }
+            $additionalWorks = json_decode($additionalWorksJson, true);
         }
+        
+        if (!is_array($records)) $records = [];
+        if (!is_array($additionalWorks)) $additionalWorks = [];
         
         $smartProcessTypeId = intval($_POST['smartProcessTypeId'] ?? 0);
         
-        if (empty($records) || $smartProcessTypeId <= 0) {
+        if (empty($records) && empty($additionalWorks)) {
             http_response_code(400);
-            die(json_encode(['success' => false, 'message' => 'Некорректные данные']));
+            die(json_encode(['success' => false, 'message' => 'Нет данных для сохранения']));
+        }
+        
+        if ($smartProcessTypeId <= 0) {
+            http_response_code(400);
+            die(json_encode(['success' => false, 'message' => 'Не указан тип смарт-процесса']));
         }
         
         $fieldDeal = $_POST['fieldDeal'] ?? '';
-        $fieldTimeSpent = $_POST['fieldTimeSpent'] ?? ''; // Убрал intval, так как это название поля
+        $fieldTimeSpent = $_POST['fieldTimeSpent'] ?? '';
         $fieldComment = $_POST['fieldComment'] ?? '';
         $fieldDealStage = $_POST['fieldDealStage'] ?? '';
         $fieldFunnel = $_POST['fieldFunnel'] ?? 'Воронка';
+        $fieldTimeType = $_POST['fieldTimeType'] ?? '';
         
         if (!class_exists('Bitrix\Crm\Service\Container')) {
             http_response_code(500);
@@ -209,42 +201,43 @@ function saveTimeRecords() {
         $created = 0;
         $errors = [];
         
+        // Сохранение записей по сделкам
         foreach ($records as $record) {
             try {
                 $dealId = intval($record['dealId'] ?? 0);
-                $time = floatval($record['timeInHours'] ?? 0); 
+                $time = floatval($record['timeInHours'] ?? 0);
                 $comment = $record['comment'] ?? '';
                 $stageName = $record['stageName'] ?? '';
                 $funnelName = $record['funnelName'] ?? '';
+                $timeType = $record['timeType'] ?? '';
                 
                 if ($dealId <= 0 || $time <= 0) continue;
                 
                 $item = $factory->createItem();
                 $item->setTitle('Затраты времени: ' . date('d.m.Y H:i'));
                 
-                // Добавляем информацию о сделке
                 if ($fieldDeal) {
                     $item->set($fieldDeal, "Сделка #$dealId: " . ($record['dealTitle'] ?? ''));
                 }
                 
-                // Добавляем время
                 if ($fieldTimeSpent) {
                     $item->set($fieldTimeSpent, $time);
                 }
                 
-                // Добавляем комментарий
                 if ($fieldComment) {
                     $item->set($fieldComment, $comment);
                 }
                 
-                // Добавляем статус сделки
                 if ($fieldDealStage && $stageName) {
                     $item->set($fieldDealStage, $stageName);
                 }
                 
-                // Добавляем воронку
                 if ($fieldFunnel && $funnelName) {
                     $item->set($fieldFunnel, $funnelName);
+                }
+                
+                if ($fieldTimeType && $timeType) {
+                    $item->set($fieldTimeType, $timeType);
                 }
                 
                 $item->setAssignedById($USER->GetID());
@@ -263,11 +256,53 @@ function saveTimeRecords() {
                     
                     $created++;
                 } else {
-                    $errors[] = 'Ошибка при создании элемента: ' . implode(', ', $result->getErrorMessages());
+                    $errors[] = 'Ошибка при создании элемента по сделке ' . $dealId . ': ' . implode(', ', $result->getErrorMessages());
                 }
                 
             } catch (Exception $e) {
                 $errors[] = 'Исключение: ' . $e->getMessage();
+            }
+        }
+        
+        // Сохранение дополнительных работ
+        foreach ($additionalWorks as $work) {
+            try {
+                $minutes = intval($work['minutes'] ?? 0);
+                if ($minutes <= 0) continue;
+                
+                $hours = round($minutes / 60, 2);
+                $name = trim($work['name'] ?? '');
+                $comment = trim($work['comment'] ?? '');
+                $timeType = $work['timeType'] ?? '';
+                
+                $item = $factory->createItem();
+                $item->setTitle($name ?: 'Дополнительные работы - ' . date('d.m.Y H:i'));
+                
+                if ($fieldTimeSpent) {
+                    $item->set($fieldTimeSpent, $hours);
+                }
+                
+                if ($fieldComment) {
+                    $item->set($fieldComment, $comment);
+                }
+                
+                if ($fieldTimeType && $timeType) {
+                    $item->set($fieldTimeType, $timeType);
+                }
+                
+                $item->setAssignedById($USER->GetID());
+                
+                $operation = $factory->getAddOperation($item);
+                $result = $operation->launch();
+                
+                if ($result->isSuccess()) {
+                    $created++;
+                } else {
+                    $errors[] = 'Ошибка при создании доп. работы "' . $name . '": ' . implode(', ', $result->getErrorMessages());
+                }
+                
+            } catch (Exception $e) {
+                $errors[] = 'Исключение при сохранении доп. работы: ' . $e->getMessage();
             }
         }
         
@@ -279,20 +314,9 @@ function saveTimeRecords() {
         
         if (!empty($errors)) {
             $response['errors'] = $errors;
-            // Добавляем первые 3 ошибки в сообщение для отладки
             if ($created == 0) {
                 $response['message'] .= '. Ошибки: ' . implode('; ', array_slice($errors, 0, 3));
             }
-        }
-        
-        // Добавляем отладочную информацию
-        if ($created == 0) {
-            $response['debug'] = [
-                'records_count' => count($records),
-                'first_record' => !empty($records) ? $records[0] : null,
-                'fieldTimeSpent' => $fieldTimeSpent,
-                'smartProcessTypeId' => $smartProcessTypeId
-            ];
         }
         
         header('Content-Type: application/json; charset=utf-8');
@@ -304,8 +328,7 @@ function saveTimeRecords() {
         header('Content-Type: application/json; charset=utf-8');
         echo json_encode([
             'success' => false,
-            'message' => 'Ошибка при сохранении записей времени: ' . $e->getMessage(),
-            'trace' => $e->getTraceAsString() 
+            'message' => 'Ошибка при сохранении записей времени: ' . $e->getMessage()
         ], JSON_UNESCAPED_UNICODE);
         exit;
     }

@@ -9,21 +9,24 @@ require($_SERVER['DOCUMENT_ROOT'] . '/bitrix/modules/main/include/prolog_before.
 
 
 $APPLICATION->IncludeComponent(
-    "custom:time.tracking",
-    ".default",
-    [
-        "DEPARTMENT_ID" => '12',
-        "FUNNEL_TZ_ID" => '34, 35',
-        "FUNNEL_HOURS_ID" => 6,
-        "SMART_PROCESS_TYPE_ID" => 1114,
-        "FIELD_DEAL" => "TITLE",
-        "FIELD_TIME_SPENT" => "UF_CRM_30_1770360084006",
-        "FIELD_COMMENT" => "UF_CRM_30_1770360099630",
-        "FIELD_DEAL_STAGE" => "UF_CRM_30_1770362875416",
-        "FIELD_FUNNEL" => "UF_CRM_30_1771589643886",
-        "CACHE_TIME" => 0
-    ],
-    false
+	"custom:time.tracking", 
+	".default", 
+	[
+		"DEPARTMENT_ID" => "7, 12",
+		"FUNNEL_TZ_ID" => '34, 35',
+		"FUNNEL_HOURS_ID" => "12",
+		"SMART_PROCESS_TYPE_ID" => "1114",
+		"FIELD_DEAL" => "TITLE",
+		"FIELD_TIME_SPENT" => "UF_CRM_30_1770645436",
+		"FIELD_COMMENT" => "UF_CRM_30_1770360099630",
+		"FIELD_DEAL_STAGE" => "UF_CRM_30_1770362875416",
+		"FIELD_FUNNEL" => "UF_CRM_30_1771589643886",
+		"FIELD_TIME_TYPE" => "UF_CRM_30_1774272898",
+		"CACHE_TIME" => "0",
+		"COMPONENT_TEMPLATE" => ".default",
+		"CACHE_TYPE" => "A"
+	],
+	false
 );
 
 

@@ -9,10 +9,10 @@
 /* Основные стили для таблицы */
 .deals-table {
     width: 100%;
-    min-width: 900px; /* Немного увеличил минимальную ширину */
+    min-width: 1100px;
     border-collapse: collapse;
     font-size: 16px;
-    table-layout: fixed; /* Меняем на fixed для более точного контроля */
+    table-layout: fixed;
 }
 
 .deals-table th {
@@ -27,13 +27,27 @@
     padding: 12px 8px;
     border-bottom: 1px solid #dee2e6;
     vertical-align: middle;
-    word-break: break-word; /* Разрешаем перенос слов */
-    white-space: normal; /* Текст переносится на следующую строку */
+    word-break: break-word;
+    white-space: normal;
     text-align: center;
 }
 
+/* Стили для выпадающего списка типа списания */
+.deals-table .ui-select,
+.additional-works-table .ui-select {
+    width: 100%;
+    height: 36px;
+    padding: 4px 8px;
+    box-sizing: border-box;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+    background-color: #fff;
+}
+
 /* Стили для числового поля времени */
-.deals-table .time-input {
+.deals-table .time-input,
+.additional-works-table .work-minutes {
     width: 100%;
     height: 36px;
     padding: 8px;
@@ -43,11 +57,13 @@
     font-size: 14px;
 }
 
-/* Стили для textarea комментария */
-.deals-table .comment-input {
+/* Стили для textarea комментария - расширяемое */
+.deals-table .comment-input,
+.additional-works-table .work-comment,
+.deals-table .subrow-comment {
     width: 100%;
     min-height: 36px;
-    max-height: 200px;
+    max-height: 150px;
     padding: 8px;
     box-sizing: border-box;
     border: 1px solid #ced4da;
@@ -59,10 +75,45 @@
     word-wrap: break-word;
     white-space: pre-wrap;
     line-height: 1.4;
+    transition: height 0.2s ease;
+}
+
+/* Стили для textarea при фокусе */
+.deals-table .comment-input:focus,
+.additional-works-table .work-comment:focus,
+.deals-table .subrow-comment:focus {
+    border-color: #80bdff;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Стили для input поля комментария в подстроках (если используется input) */
+.deals-table .subrow-comment-input {
+    width: 100%;
+    min-height: 36px;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+}
+
+/* Поле наименования работ */
+.additional-works-table .work-name {
+    width: 100%;
+    height: 36px;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 14px;
 }
 
 .deals-table input:focus,
-.deals-table .comment-input:focus {
+.deals-table .ui-select:focus,
+.additional-works-table input:focus,
+.additional-works-table .ui-select:focus {
     border-color: #80bdff;
     outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
@@ -82,15 +133,15 @@
     text-decoration: underline;
 }
 
-/* Распределение ширины столбцов */
+/* Распределение ширины столбцов для основной таблицы (6 столбцов) */
 .deals-table th:nth-child(1),
 .deals-table td:nth-child(1) {
-    width: 15%; /* Название сделки */
+    width: 20%; /* Название сделки */
 }
 
 .deals-table th:nth-child(2),
 .deals-table td:nth-child(2) {
-    width: 18%; /* Воронка */
+    width: 15%; /* Воронка */
 }
 
 .deals-table th:nth-child(3),
@@ -100,18 +151,23 @@
 
 .deals-table th:nth-child(4),
 .deals-table td:nth-child(4) {
-    width: 10%; /* Время */
+    width: 15%; /* Тип списания */
 }
 
 .deals-table th:nth-child(5),
 .deals-table td:nth-child(5) {
-    width: 42%; /* Комментарий */
+    width: 10%; /* Трудозатраты (минуты) - небольшая ширина */
 }
 
-/* Специальные стили для поля времени */
-.deals-table td:nth-child(4) .time-input {
-    width: 80px; /* Фиксированная ширина для поля времени */
-    min-width: 70px;
+.deals-table th:nth-child(6),
+.deals-table td:nth-child(6) {
+    width: 25%; /* Комментарий */
+}
+
+/* Специальные стили для поля времени (теперь 5-я колонка) */
+.deals-table td:nth-child(5) .time-input {
+    width: 100px;
+    min-width: 80px;
     margin: 0 auto;
     display: block;
 }
@@ -120,6 +176,152 @@
 .deals-table td {
     white-space: normal;
     word-wrap: break-word;
+}
+
+/* ===== Стили для блока дополнительных работ ===== */
+.additional-works-block {
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 2px solid #e0e0e0;
+}
+
+.additional-works-block h3 {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+/* Таблица дополнительных работ */
+.additional-works-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+    table-layout: fixed;
+}
+
+.additional-works-table th {
+    background-color: #f8f9fa;
+    padding: 12px 8px;
+    text-align: center;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: bold;
+}
+
+.additional-works-table td {
+    padding: 12px 8px;
+    border-bottom: 1px solid #dee2e6;
+    vertical-align: middle;
+}
+
+/* Распределение ширины столбцов для дополнительной таблицы (5 столбцов) */
+.additional-works-table th:nth-child(1),
+.additional-works-table td:nth-child(1) {
+    width: 30%; /* Наименование работ */
+}
+
+.additional-works-table th:nth-child(2),
+.additional-works-table td:nth-child(2) {
+    width: 25%; /* Тип списания */
+}
+
+.additional-works-table th:nth-child(3),
+.additional-works-table td:nth-child(3) {
+    width: 15%; /* Трудозатраты */
+}
+
+.additional-works-table th:nth-child(4),
+.additional-works-table td:nth-child(4) {
+    width: 25%; /* Комментарий */
+}
+
+.additional-works-table th:nth-child(5),
+.additional-works-table td:nth-child(5) {
+    width: 5%; /* Действия */
+}
+
+/* Специальные стили для поля минут в дополнительной таблице */
+.additional-works-table td:nth-child(3) .work-minutes {
+    width: 100px;
+    min-width: 80px;
+    margin: 0 auto;
+    display: block;
+}
+
+/* Стили для textarea в дополнительной таблице */
+.additional-works-table .work-comment {
+    resize: vertical;
+    overflow-y: auto;
+}
+
+/* Стили для блока сделок (карточки) */
+.deal-card {
+    margin-bottom: 20px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.deal-header {
+    padding: 12px 16px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Стили для подстрок в сделках */
+.deal-subrows-container .ui-select {
+    width: 100%;
+    height: 36px;
+    padding: 4px 8px;
+    box-sizing: border-box;
+}
+
+.deal-subrows-container .time-input {
+    width: 100px;
+    min-width: 80px;
+    height: 36px;
+    padding: 8px;
+    box-sizing: border-box;
+    margin: 0 auto;
+    display: block;
+}
+
+.deal-subrows-container .subrow-comment {
+    width: 100%;
+    min-height: 36px;
+    max-height: 150px;
+    padding: 8px;
+    box-sizing: border-box;
+    resize: vertical;
+    font-family: inherit;
+    line-height: 1.4;
+}
+
+/* Кнопка добавления строки */
+.btn-add-row {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+/* Кнопка удаления строки */
+.btn-remove-row {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 0;
+    width: 30px;
+    height: 30px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-remove-row:hover {
+    opacity: 0.7;
 }
 
 /* Стили для сообщений */
